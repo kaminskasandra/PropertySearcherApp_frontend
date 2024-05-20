@@ -1,7 +1,7 @@
 package com.example.propertysearcherproject.views;
 
-import com.example.propertysearcherproject.Message;
-import com.example.propertysearcherproject.MessageCategory;
+import com.example.propertysearcherproject.domain.Message;
+import com.example.propertysearcherproject.domain.MessageCategory;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.grid.Grid;

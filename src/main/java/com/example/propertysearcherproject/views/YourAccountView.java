@@ -1,6 +1,6 @@
 package com.example.propertysearcherproject.views;
 
-import com.example.propertysearcherproject.User;
+import com.example.propertysearcherproject.domain.User;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H1;

@@ -1,4 +1,4 @@
-package com.example.propertysearcherproject;
+package com.example.propertysearcherproject.domain;
 
 import lombok.Data;
 

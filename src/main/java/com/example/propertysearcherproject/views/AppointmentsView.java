@@ -1,6 +1,6 @@
 package com.example.propertysearcherproject.views;
 
-import com.example.propertysearcherproject.Appointment;
+import com.example.propertysearcherproject.domain.Appointment;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.grid.Grid;
