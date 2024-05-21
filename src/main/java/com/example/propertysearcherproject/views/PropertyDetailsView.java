@@ -1,44 +1,46 @@
 package com.example.propertysearcherproject.views;
 
 import com.example.propertysearcherproject.domain.Property;
+import com.example.propertysearcherproject.integration.PropertyBackendIntegrationClient;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.*;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 
 @Route("property-details")
+@org.springframework.stereotype.Component
 public class PropertyDetailsView extends VerticalLayout implements HasUrlParameter<Long> {
 
-    private PropertyService propertyService;
+    private final PropertyBackendIntegrationClient propertyBackendIntegrationClient;
 
-    public PropertyDetailsView(PropertyService propertyService) {
-        this.propertyService = propertyService;
+    @Autowired
+    public PropertyDetailsView(PropertyBackendIntegrationClient propertyBackendIntegrationClient) {
+        this.propertyBackendIntegrationClient = propertyBackendIntegrationClient;
     }
 
     @Override
     public void setParameter(BeforeEvent beforeEvent, @OptionalParameter Long propertyId) {
         removeAll();
         if (propertyId != null) {
-            Property property = propertyService.getPropertyById(propertyId);
-            if (property != null) {
+            Property property = propertyBackendIntegrationClient.getPropertyById(propertyId);
+            if (property != null && property.getPropertyId() != null) {
                 addHeader(property);
                 addDetails(property);
             } else {
                 add(new Text("Property not found"));
             }
-        } else {
-            add(new Text("No property ID provided"));
         }
     }
 
     private void addHeader(Property property) {
         Span header = new Span("Property Details");
-        header.getStyle().setFontSize("24px").setFontWeight("bold");
+        header.getStyle().set("font-size", "24px").set("font-weight", "bold");
         add(header);
 
         Button backButton = new Button("Back to Property List");
@@ -47,21 +49,20 @@ public class PropertyDetailsView extends VerticalLayout implements HasUrlParamet
     }
 
     private void addDetails(Property property) {
-        Map<String, String> details = new HashMap<>();
-        details.put("ID", property.getId().toString());
+        Map<String, String> details = new LinkedHashMap<>();
+        details.put("ID", property.getPropertyId().toString());
         details.put("Type", property.getPropertyType().toString());
         details.put("Price", Double.toString(property.getPrice()));
         details.put("Address", property.getAddress());
         details.put("Area", Double.toString(property.getArea()));
-        details.put("Description", property.getDescription().toString());
+        details.put("Description", property.getDescription());
 
         VerticalLayout detailsLayout = new VerticalLayout();
         detailsLayout.setDefaultHorizontalComponentAlignment(Alignment.START);
         details.forEach((key, value) -> {
-            Span detailLabel = new Span(key + ": ");
-            Text detailValue = new Text(value);
+            Span detailLabel = new Span(key + ": " + value);
             detailLabel.getStyle().set("font-weight", "bold");
-            detailsLayout.add(detailLabel, detailValue);
+            detailsLayout.add(detailLabel);
         });
 
         add(detailsLayout);

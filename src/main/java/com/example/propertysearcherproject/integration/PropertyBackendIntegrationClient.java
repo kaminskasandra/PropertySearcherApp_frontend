@@ -9,6 +9,8 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 
+import static org.reflections.Reflections.log;
+
 @AllArgsConstructor
 @Component
 public class PropertyBackendIntegrationClient {
@@ -23,13 +25,15 @@ public class PropertyBackendIntegrationClient {
                 .block();
     }
 
-    public Property getPropertyById(Long id) {
-        return webClient.getWebClient()
+    public Property getPropertyById(Long propertyId) {
+        Property property = webClient.getWebClient()
                 .get()
-                .uri("/property/" + id)
+                .uri("/property/" + propertyId)
                 .retrieve()
                 .bodyToMono(Property.class)
                 .block();
+        log.debug("Received property: {}", property);
+        return property;
     }
 
     public Void deletePropertyById(Long id) {

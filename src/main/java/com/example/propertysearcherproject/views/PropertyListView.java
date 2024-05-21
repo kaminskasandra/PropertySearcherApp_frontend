@@ -25,12 +25,12 @@ public class PropertyListView extends VerticalLayout {
     private final Grid<Property> grid;
     private List<Property> properties = new ArrayList<>();
 
-    public PropertyListView(PropertyService propertyService, PropertyBackendIntegrationClient propertyBackendIntegrationClient) {
+    public PropertyListView(PropertyBackendIntegrationClient propertyBackendIntegrationClient) {
         List<LinkedHashMap<String, Object>> allProperty = propertyBackendIntegrationClient.getAllProperty();
 
         for (LinkedHashMap<String, Object> property : allProperty) {
             properties.add(Property.builder()
-                    .id(Long.valueOf((Integer) property.get("propertyId")))
+                    .propertyId(Long.valueOf((Integer) property.get("propertyId")))
                     .propertyType(PropertyType.valueOf((String) property.get("propertyType")))
                     .price((Double) property.get("price"))
                     .address((String) property.get("address"))
@@ -62,7 +62,7 @@ public class PropertyListView extends VerticalLayout {
         grid = new Grid<>(Property.class);
         grid.setItems(properties);
         grid.removeAllColumns();
-        grid.addColumn(Property::getId).setHeader("ID");
+        grid.addColumn(Property::getPropertyId).setHeader("ID");
         grid.addColumn(Property::getPropertyType).setHeader("Type");
         grid.addColumn(Property::getPrice).setHeader("Price");
         grid.addColumn(Property::getAddress).setHeader("Address");
@@ -70,7 +70,7 @@ public class PropertyListView extends VerticalLayout {
 
         grid.addItemClickListener(event -> {
             Property property = event.getItem();
-            getUI().ifPresent(ui -> ui.navigate(PropertyDetailsView.class, property.getId()));
+            getUI().ifPresent(ui -> ui.navigate(PropertyDetailsView.class, property.getPropertyId()));
         });
 
         setAlignItems(Alignment.CENTER);

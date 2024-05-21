@@ -8,7 +8,7 @@ import lombok.Data;
 @AllArgsConstructor
 @Builder
 public class Property {
-    private Long id;
+    private Long propertyId;
     private PropertyType propertyType;
     private double price;
     private String address;
