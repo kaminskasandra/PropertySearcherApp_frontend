@@ -2,6 +2,7 @@ package com.example.propertysearcherproject.views;
 
 import com.example.propertysearcherproject.domain.Property;
 import com.example.propertysearcherproject.domain.PropertyType;
+import com.example.propertysearcherproject.domain.User;
 import com.example.propertysearcherproject.integration.PropertyBackendIntegrationClient;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
@@ -12,6 +13,8 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.VaadinSession;
+import org.springframework.context.annotation.Scope;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -20,12 +23,20 @@ import java.util.stream.Collectors;
 
 @Route("property-list")
 @org.springframework.stereotype.Component
+@Scope("prototype")
 public class PropertyListView extends VerticalLayout {
 
     private final Grid<Property> grid;
     private List<Property> properties = new ArrayList<>();
 
     public PropertyListView(PropertyBackendIntegrationClient propertyBackendIntegrationClient) {
+        try {
+            User username = (User) VaadinSession.getCurrent().getAttribute("username");
+            Span welcomeLabel = new Span("Welcome to the Property Searcher, " + username.getUserName() + "!");
+            add(welcomeLabel);
+        } catch (Exception ignored) {
+
+        }
         List<LinkedHashMap<String, Object>> allProperty = propertyBackendIntegrationClient.getAllProperty();
 
         for (LinkedHashMap<String, Object> property : allProperty) {
@@ -41,17 +52,7 @@ public class PropertyListView extends VerticalLayout {
         Span title = new Span("PROPERTY SEARCHER");
         title.getStyle().set("font-size", "24px");
 
-        Button appointmentsButton = new Button("Appointments");
-        Button yourAccountButton = new Button("Your Account");
-        Button messagesButton = new Button("Messages");
-
-        appointmentsButton.addClickListener(event -> navigateTo(AppointmentsView.class));
-        yourAccountButton.addClickListener(event -> navigateTo(YourAccountView.class));
-        messagesButton.addClickListener(event -> navigateTo(MessagesView.class));
-
-        HorizontalLayout menuLayout = new HorizontalLayout();
-        menuLayout.setAlignItems(Alignment.CENTER);
-        menuLayout.add(appointmentsButton, yourAccountButton, messagesButton);
+        HorizontalLayout menuLayout = getMenuLayout();
 
         TextField searchField = new TextField();
         searchField.setPlaceholder("Search by address");
@@ -75,6 +76,23 @@ public class PropertyListView extends VerticalLayout {
 
         setAlignItems(Alignment.CENTER);
         add(title, menuLayout, searchField, grid);
+    }
+
+    private HorizontalLayout getMenuLayout() {
+        Button appointmentsButton = new Button("Appointments");
+        Button yourAccountButton = new Button("Your Account");
+        Button messagesButton = new Button("Messages");
+        Button offersButton = new Button("Your offers");
+
+        appointmentsButton.addClickListener(event -> navigateTo(AppointmentsView.class));
+        yourAccountButton.addClickListener(event -> navigateTo(YourAccountView.class));
+        messagesButton.addClickListener(event -> navigateTo(MessagesView.class));
+        offersButton.addClickListener(event -> navigateTo(YourOffersView.class));
+
+        HorizontalLayout menuLayout = new HorizontalLayout();
+        menuLayout.setAlignItems(Alignment.CENTER);
+        menuLayout.add(appointmentsButton, yourAccountButton, messagesButton, offersButton);
+        return menuLayout;
     }
 
     private void filterGrid(String filterText) {

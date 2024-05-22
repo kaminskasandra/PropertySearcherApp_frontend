@@ -3,6 +3,7 @@ package com.example.propertysearcherproject.integration;
 import com.example.propertysearcherproject.domain.Appointment;
 import com.example.propertysearcherproject.configuration.WebClientConfig;
 import lombok.AllArgsConstructor;
+import org.springframework.context.annotation.Scope;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
@@ -11,6 +12,7 @@ import java.util.List;
 
 @AllArgsConstructor
 @Component
+@Scope("prototype")
 public class AppointmentBackendIntegrationClient {
     private final WebClientConfig webClient;
 
@@ -23,19 +25,19 @@ public class AppointmentBackendIntegrationClient {
                 .block();
     }
 
-    public Appointment getAppointmentById(Long id) {
+    public Appointment getAppointmentById(Long appointmentId) {
         return webClient.getWebClient()
                 .get()
-                .uri("/appointments/" + id)
+                .uri("/appointments/" + appointmentId)
                 .retrieve()
                 .bodyToMono(Appointment.class)
                 .block();
     }
 
-    public Void deleteAppointmentById(Long id) {
+    public Void deleteAppointmentById(Long appointmentId) {
         return webClient.getWebClient()
                 .delete()
-                .uri("/appointments/" + id)
+                .uri("/appointments/" + appointmentId)
                 .retrieve()
                 .bodyToMono(Void.class)
                 .block();
@@ -51,10 +53,10 @@ public class AppointmentBackendIntegrationClient {
                 .block();
     }
 
-    public Mono<Appointment> updateAppointment(Appointment appointment, Long id) {
+    public Mono<Appointment> updateAppointment(Appointment appointment, Long appointmentId) {
         return webClient.getWebClient()
                 .put()
-                .uri("/appointments/" + id)
+                .uri("/appointments/" + appointmentId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(Mono.just(appointment), Appointment.class)
                 .retrieve()

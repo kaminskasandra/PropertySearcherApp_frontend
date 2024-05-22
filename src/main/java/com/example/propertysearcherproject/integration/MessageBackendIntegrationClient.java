@@ -1,7 +1,8 @@
 package com.example.propertysearcherproject.integration;
 
-import com.example.propertysearcherproject.domain.Property;
 import com.example.propertysearcherproject.configuration.WebClientConfig;
+import com.example.propertysearcherproject.domain.Message;
+import com.example.propertysearcherproject.domain.Property;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Scope;
 import org.springframework.http.MediaType;
@@ -10,60 +11,49 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 
-import static org.reflections.Reflections.log;
-
 @AllArgsConstructor
 @Component
 @Scope("prototype")
-public class PropertyBackendIntegrationClient {
+public class MessageBackendIntegrationClient {
     private final WebClientConfig webClient;
 
-    public List getAllProperty() {
+    public List getAllMessages(long userId) {
         return webClient.getWebClient()
                 .get()
-                .uri("/property")
+                .uri(uriBuilder -> uriBuilder.path("/message/findAllByUserId")
+                        .queryParam("userId", userId)
+                        .build())
                 .retrieve()
                 .bodyToMono(List.class)
                 .block();
     }
 
-    public Property getPropertyById(Long propertyId) {
-        Property property = webClient.getWebClient()
+    public Message getMessageById(Long messageId) {
+        Message message = webClient.getWebClient()
                 .get()
-                .uri("/property/" + propertyId)
+                .uri("/message/" + messageId)
                 .retrieve()
-                .bodyToMono(Property.class)
+                .bodyToMono(Message.class)
                 .block();
-        log.debug("Received property: {}", property);
-        return property;
+        return message;
     }
 
-    public Void deletePropertyById(Long id) {
+    public Void deleteMessageById(Long id) {
         return webClient.getWebClient()
                 .delete()
-                .uri("/property/" + id)
+                .uri("/message/" + id)
                 .retrieve()
                 .bodyToMono(Void.class)
                 .block();
     }
 
-    public Property saveProperty(Property property) {
+    public Property saveMessage(Message message) {
         return webClient.getWebClient()
                 .post()
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(Mono.just(property), Property.class)
+                .body(Mono.just(message), Message.class)
                 .retrieve()
                 .bodyToMono(Property.class)
                 .block();
-    }
-
-    public Mono<Property> updateProperty(Property property, Long propertyId) {
-        return webClient.getWebClient()
-                .put()
-                .uri("/property/" + propertyId)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(Mono.just(property), Property.class)
-                .retrieve()
-                .bodyToMono(Property.class);
     }
 }

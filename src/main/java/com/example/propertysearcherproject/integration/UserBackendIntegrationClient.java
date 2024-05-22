@@ -44,6 +44,7 @@ public class UserBackendIntegrationClient {
     public User saveUser(User user) {
         return webClient.getWebClient()
                 .post()
+                .uri("/users")
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(Mono.just(user), User.class)
                 .retrieve()
@@ -51,13 +52,26 @@ public class UserBackendIntegrationClient {
                 .block();
     }
 
-    public Mono<User> updateUser(User user, Long userId) {
+    public User updateUser(User user, Long userId) {
         return webClient.getWebClient()
                 .put()
                 .uri("/users/" + userId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(Mono.just(user), User.class)
                 .retrieve()
-                .bodyToMono(User.class);
+                .bodyToMono(User.class)
+                .block();
+    }
+
+    public User getUserByMail(String mail) {
+        return webClient.getWebClient()
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/users/findByMail")
+                        .queryParam("mail", mail)
+                        .build())
+                .retrieve()
+                .bodyToMono(User.class)
+                .block();
     }
 }
