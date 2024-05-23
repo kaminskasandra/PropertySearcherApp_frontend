@@ -62,4 +62,13 @@ public class AppointmentBackendIntegrationClient {
                 .retrieve()
                 .bodyToMono(Appointment.class);
     }
+    public List getAppointmentsByUserId(Long userId) {
+            return webClient.getWebClient()
+                    .get()
+                    .uri("/appointments/findAllByUserId/" + userId)
+                    .retrieve()
+                    .bodyToFlux(Appointment.class)
+                    .collectList()
+                    .block();
+    }
 }

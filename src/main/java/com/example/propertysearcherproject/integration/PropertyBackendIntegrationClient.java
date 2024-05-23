@@ -66,4 +66,13 @@ public class PropertyBackendIntegrationClient {
                 .retrieve()
                 .bodyToMono(Property.class);
     }
+    public List<Property> getPropertiesByUser(Long userId) {
+        return webClient.getWebClient()
+                .get()
+                .uri("/user/{userId}", userId)
+                .retrieve()
+                .bodyToFlux(Property.class)
+                .collectList()
+                .block();
+    }
 }
