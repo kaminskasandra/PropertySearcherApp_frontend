@@ -47,7 +47,7 @@ public class YourOffersView extends VerticalLayout {
 
     private void loadUserProperties(Grid<Property> propertyGrid) {
         try {
-            User user = (User) VaadinSession.getCurrent().getAttribute("userName");
+            User user = (User) VaadinSession.getCurrent().getAttribute("username");
             List<Property> properties = propertyBackendIntegrationClient.getPropertiesByUser(user.getUserId());
             propertyGrid.setItems(properties);
         } catch (Exception e) {

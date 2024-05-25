@@ -69,7 +69,7 @@ public class PropertyBackendIntegrationClient {
     public List<Property> getPropertiesByUser(Long userId) {
         return webClient.getWebClient()
                 .get()
-                .uri("/user/{userId}", userId)
+                .uri("/property/user/{userId}", userId)
                 .retrieve()
                 .bodyToFlux(Property.class)
                 .collectList()
