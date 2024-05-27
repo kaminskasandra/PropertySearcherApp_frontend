@@ -9,7 +9,6 @@ import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H2;
-import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -80,7 +79,7 @@ public class MessagesView extends VerticalLayout {
 
         HorizontalLayout buttonsLayout = new HorizontalLayout(sentButton, receivedButton, deleteButton);
         add(mainViewButton, header);
-        addNewMessageForm();
+        addNewMessageForm(user);
         add(datePicker, buttonsLayout, messagesGrid);
     }
 
@@ -122,7 +121,7 @@ public class MessagesView extends VerticalLayout {
     private void deleteMessage(Long messageId) {
         messageBackendIntegrationClient.deleteMessageById(messageId);
     }
-    private void addNewMessageForm() {
+    private void addNewMessageForm(User user) {
         H2 newMessageHeader = new H2("Create new message");
         newMessageHeader.getStyle().set("font-size", "20px").set("font-weight", "bold");
 
@@ -140,6 +139,8 @@ public class MessagesView extends VerticalLayout {
                         .text(messageText)
                         .messageCategory(MessageCategory.SENT)
                         .date(LocalDate.now())
+                        .toUserMail(userEmail)
+                        .fromUserMail(user.getMail())
                         .build();
                 messageBackendIntegrationClient.saveMessage(newMessage);
                 allMessages.add(newMessage);

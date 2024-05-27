@@ -50,6 +50,7 @@ public class PropertyBackendIntegrationClient {
     public Property saveProperty(Property property) {
         return webClient.getWebClient()
                 .post()
+                .uri("/property")
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(Mono.just(property), Property.class)
                 .retrieve()

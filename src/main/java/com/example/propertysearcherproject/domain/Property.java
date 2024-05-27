@@ -14,4 +14,5 @@ public class Property {
     private String address;
     private double area;
     private String description;
+    private Long userId;
 }

@@ -37,7 +37,7 @@ public class AppointmentBackendIntegrationClient {
     public Void deleteAppointmentById(Long appointmentId) {
         return webClient.getWebClient()
                 .delete()
-                .uri("/appointments/" + appointmentId)
+                .uri("/appointments" + appointmentId)
                 .retrieve()
                 .bodyToMono(Void.class)
                 .block();
@@ -46,6 +46,7 @@ public class AppointmentBackendIntegrationClient {
     public Appointment saveAppointment(Appointment appointment) {
         return webClient.getWebClient()
                 .post()
+                .uri("/appointments")
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(Mono.just(appointment), Appointment.class)
                 .retrieve()
@@ -65,7 +66,7 @@ public class AppointmentBackendIntegrationClient {
     public List getAppointmentsByUserId(Long userId) {
             return webClient.getWebClient()
                     .get()
-                    .uri("/appointments/findAllByUserId/" + userId)
+                    .uri("/appointments/user/" + userId)
                     .retrieve()
                     .bodyToFlux(Appointment.class)
                     .collectList()

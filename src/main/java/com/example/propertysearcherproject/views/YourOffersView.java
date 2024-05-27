@@ -1,9 +1,11 @@
 package com.example.propertysearcherproject.views;
 
 import com.example.propertysearcherproject.domain.Property;
+import com.example.propertysearcherproject.domain.PropertyType;
 import com.example.propertysearcherproject.domain.User;
 import com.example.propertysearcherproject.integration.PropertyBackendIntegrationClient;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
@@ -38,30 +40,35 @@ public class YourOffersView extends VerticalLayout {
         propertyGrid.setColumns("propertyId", "propertyType", "price", "address", "area", "description");
 
         Button addButton = new Button("Add Property");
-        addButton.addClickListener(event -> showAddPropertyForm());
+        User user = loadUserProperties(propertyGrid);
+        addButton.addClickListener(event -> showAddPropertyForm(user));
 
         add(mainViewButton, header, propertyGrid, addButton);
 
-        loadUserProperties(propertyGrid);
     }
 
-    private void loadUserProperties(Grid<Property> propertyGrid) {
+    private User loadUserProperties(Grid<Property> propertyGrid) {
         try {
             User user = (User) VaadinSession.getCurrent().getAttribute("username");
             List<Property> properties = propertyBackendIntegrationClient.getPropertiesByUser(user.getUserId());
             propertyGrid.setItems(properties);
+            return user;
         } catch (Exception e) {
             Notification.show("Error loading properties: " + e.getMessage(), 3000, Notification.Position.MIDDLE);
         }
+
+        return null;
     }
 
-    private void showAddPropertyForm() {
+    private void showAddPropertyForm(User user) {
         Dialog dialog = new Dialog();
         dialog.setWidth("400px");
 
         FormLayout formLayout = new FormLayout();
 
-        TextField propertyTypeField = new TextField("Property Type");
+        ComboBox<PropertyType> propertyTypeComboBox = new ComboBox<>("Property Type");
+        propertyTypeComboBox.setItems(PropertyType.values());
+
         NumberField priceField = new NumberField("Price");
         TextField addressField = new TextField("Address");
         NumberField areaField = new NumberField("Area");
@@ -69,14 +76,23 @@ public class YourOffersView extends VerticalLayout {
         descriptionField.setWidthFull();
         descriptionField.setHeight("150px");
 
-        formLayout.add(propertyTypeField, priceField, addressField, areaField, descriptionField);
+        formLayout.add(propertyTypeComboBox, priceField, addressField, areaField, descriptionField);
 
         Button saveButton = new Button("Save", event -> {
-            String propertyType = propertyTypeField.getValue();
+            PropertyType propertyType = propertyTypeComboBox.getValue();
             Double price = priceField.getValue();
             String address = addressField.getValue();
             Double area = areaField.getValue();
             String description = descriptionField.getValue();
+
+            propertyBackendIntegrationClient.saveProperty(Property.builder()
+                    .propertyType(propertyType)
+                    .address(address)
+                    .price(price)
+                    .area(area)
+                    .description(description)
+                    .userId(user.getUserId())
+                    .build());
 
             Notification.show("Property added:\n" +
                             "Type: " + propertyType + "\n" +

@@ -4,6 +4,8 @@ import com.example.propertysearcherproject.domain.Property;
 import com.example.propertysearcherproject.domain.PropertyType;
 import com.example.propertysearcherproject.domain.User;
 import com.example.propertysearcherproject.integration.PropertyBackendIntegrationClient;
+import com.example.propertysearcherproject.integration.WeatherIntegration;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
@@ -29,7 +31,7 @@ public class PropertyListView extends VerticalLayout {
     private final Grid<Property> grid;
     private List<Property> properties = new ArrayList<>();
 
-    public PropertyListView(PropertyBackendIntegrationClient propertyBackendIntegrationClient) {
+    public PropertyListView(PropertyBackendIntegrationClient propertyBackendIntegrationClient, WeatherIntegration weatherIntegration) {
         try {
             User username = (User) VaadinSession.getCurrent().getAttribute("username");
             Span welcomeLabel = new Span("Welcome to the Property Searcher, " + username.getUserName() + "!");
@@ -52,7 +54,7 @@ public class PropertyListView extends VerticalLayout {
         Span title = new Span("PROPERTY SEARCHER");
         title.getStyle().set("font-size", "24px");
 
-        HorizontalLayout menuLayout = getMenuLayout();
+        HorizontalLayout menuLayout = getMenuLayout(weatherIntegration);
 
         TextField searchField = new TextField();
         searchField.setPlaceholder("Search by address");
@@ -78,7 +80,7 @@ public class PropertyListView extends VerticalLayout {
         add(title, menuLayout, searchField, grid);
     }
 
-    private HorizontalLayout getMenuLayout() {
+    private HorizontalLayout getMenuLayout(WeatherIntegration weatherIntegration) {
         Button appointmentsButton = new Button("Appointments");
         Button yourAccountButton = new Button("Your Account");
         Button messagesButton = new Button("Messages");
@@ -92,6 +94,24 @@ public class PropertyListView extends VerticalLayout {
         HorizontalLayout menuLayout = new HorizontalLayout();
         menuLayout.setAlignItems(Alignment.CENTER);
         menuLayout.add(appointmentsButton, yourAccountButton, messagesButton, offersButton);
+
+
+        Span weatherInfo = new Span();
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            LinkedHashMap<LinkedHashMap<String, Object>, LinkedHashMap<String, Object>> weather =
+                    (LinkedHashMap<LinkedHashMap<String, Object>, LinkedHashMap<String, Object>>) objectMapper.readValue(weatherIntegration.getActualWeather("Warsaw"), Object.class);
+
+            LinkedHashMap<String, Object> currentWeather = weather.get("current");
+
+            weatherInfo.setText("Actual Weather: " + currentWeather.get("temp_c") + "°C @Powered by WeatherApi.com");
+        } catch (Exception e) {
+            weatherInfo.setText("Weather info not available");
+        }
+        weatherInfo.getStyle().set("margin-left", "auto"); // Umieszczamy po prawej stronie
+
+        menuLayout.add(weatherInfo);
+
         return menuLayout;
     }
 
