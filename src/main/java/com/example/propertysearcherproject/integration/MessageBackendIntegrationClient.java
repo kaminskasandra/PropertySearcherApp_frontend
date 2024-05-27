@@ -50,6 +50,7 @@ public class MessageBackendIntegrationClient {
     public Property saveMessage(Message message) {
         return webClient.getWebClient()
                 .post()
+                .uri("/message")
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(Mono.just(message), Message.class)
                 .retrieve()
